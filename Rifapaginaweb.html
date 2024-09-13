@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compra de Boletos de Lotería</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .ticket-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 10px;
+        }
+        .ticket-grid button {
+            padding: 10px;
+            background-color: #ddd;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .ticket-grid button.selected {
+            background-color: #4caf50;
+            color: white;
+            cursor: default;
+        }
+        .ticket-grid button.reserved {
+            background-color: #f44336;
+            color: white;
+            cursor: default;
+        }
+        .summary {
+            margin-top: 20px;
+        }
+        .summary p {
+            font-size: 18px;
+        }
+        button#purchase {
+            width: 100%;
+            padding: 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        button#purchase:disabled {
+            background-color: #ddd;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Compra de Boletos de Lotería</h1>
+        <p>Cada boleto tiene un costo de $200 MXN. Por favor, selecciona tus números:</p>
+        
+        <div class="ticket-grid" id="ticketGrid"></div>
+
+        <div class="summary">
+            <p><strong>Números seleccionados:</strong> <span id="selectedTickets">Ninguno</span></p>
+            <p><strong>Total a pagar:</strong> $<span id="totalAmount">0</span> MXN</p>
+        </div>
+
+        <button id="purchase" disabled>Comprar Boletos</button>
+
+        <p>Realiza el pago a la cuenta bancaria STP:<br><strong>646180137005540631</strong></p>
+    </div>
+
+    <script>
+        const ticketGrid = document.getElementById("ticketGrid");
+        const selectedTicketsDisplay = document.getElementById("selectedTickets");
+        const totalAmountDisplay = document.getElementById("totalAmount");
+        const purchaseButton = document.getElementById("purchase");
+
+        let selectedTickets = [];
+        let reservedTickets = [];
+        const ticketPrice = 200;
+
+        // Inicializar los 150 boletos
+        for (let i = 1; i <= 150; i++) {
+            const button = document.createElement("button");
+            button.textContent = i;
+            button.id = `ticket-${i}`;
+            button.addEventListener("click", () => selectTicket(i));
+            ticketGrid.appendChild(button);
+        }
+
+        function selectTicket(ticketNumber) {
+            if (reservedTickets.includes(ticketNumber)) return; // Evitar que se seleccionen boletos ya apartados
+
+            const ticketIndex = selectedTickets.indexOf(ticketNumber);
+            if (ticketIndex > -1) {
+                // Si el boleto ya está seleccionado, lo deseleccionamos
+                selectedTickets.splice(ticketIndex, 1);
+                document.getElementById(`ticket-${ticketNumber}`).classList.remove("selected");
+            } else {
+                // Si no está seleccionado, lo añadimos
+                selectedTickets.push(ticketNumber);
+                document.getElementById(`ticket-${ticketNumber}`).classList.add("selected");
+            }
+
+            updateSelection();
+        }
+
+        function updateSelection() {
+            if (selectedTickets.length > 0) {
+                selectedTicketsDisplay.textContent = selectedTickets.join(", ");
+                totalAmountDisplay.textContent = selectedTickets.length * ticketPrice;
+                purchaseButton.disabled = false;
+            } else {
+                selectedTicketsDisplay.textContent = "Ninguno";
+                totalAmountDisplay.textContent = 0;
+                purchaseButton.disabled = true;
+            }
+        }
+
+        // Simular la compra de boletos (sin integración de pago real)
+        purchaseButton.addEventListener("click", () => {
+            if (selectedTickets.length > 0) {
+                // Apartar los boletos
+                reservedTickets.push(...selectedTickets);
+                selectedTickets.forEach(ticketNumber => {
+                    document.getElementById(`ticket-${ticketNumber}`).classList.add("reserved");
+                    document.getElementById(`ticket-${ticketNumber}`).classList.remove("selected");
+                });
+                
+                // Reiniciar la selección
+                alert(`Has comprado los boletos número ${selectedTickets.join(", ")}. Por favor, realiza el pago a la cuenta STP: 646180137005540631`);
+                selectedTickets = [];
+                updateSelection();
+            }
+        });
+    </script>
+</body>
+</html>
